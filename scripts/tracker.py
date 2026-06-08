@@ -1,0 +1,52 @@
+import json
+import os
+import requests
+from datetime import datetime
+
+TOKEN = os.environ["CORP_GITHUB_TOKEN"]
+USERNAME = os.environ["CORP_USERNAME"]
+
+headers = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Accept": "application/vnd.github+json"
+}
+
+url = f"https://api.github.com/users/{USERNAME}/events"
+
+response = requests.get(url, headers=headers)
+events = response.json()
+
+with open("state.json", "r") as f:
+    state = json.load(f)
+
+last_event_id = state["last_event_id"]
+
+new_pushes = []
+
+for event in events:
+    if event["type"] == "PushEvent":
+        if str(event["id"]) == str(last_event_id):
+            break
+        new_pushes.append(event)
+
+if new_pushes:
+
+    state["last_event_id"] = new_pushes[0]["id"]
+    state["work_commits_detected"] += len(new_pushes)
+
+    with open("state.json", "w") as f:
+        json.dump(state, f, indent=2)
+
+    with open("README.md", "w") as f:
+        f.write(
+f"""# Work Activity Tracker
+
+Professional commits detected: {state['work_commits_detected']}
+
+Last activity: {datetime.utcnow()}
+"""
+        )
+
+    print("UPDATE_REQUIRED")
+else:
+    print("NO_CHANGES")
