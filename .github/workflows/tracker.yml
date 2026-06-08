@@ -1,0 +1,46 @@
+name: Work Activity Tracker
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  track:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run tracker
+        env:
+          CORP_GITHUB_TOKEN: ${{ secrets.CORP_GITHUB_TOKEN }}
+          CORP_USERNAME: ${{ secrets.CORP_USER }}
+        run: |
+          python scripts/tracker.py > output.txt
+
+      - name: Commit changes
+        run: |
+          if grep -q UPDATE_REQUIRED output.txt; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+
+            git add .
+            git commit -m "docs: update work activity"
+            git push
+          fi
