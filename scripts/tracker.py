@@ -14,11 +14,7 @@ headers = {
 url = f"https://api.github.com/users/{USERNAME}/events"
 
 response = requests.get(url, headers=headers)
-print("STATUS:", response.status_code)
-print(response.text)
-exit()
 events = response.json()
-print("TOTAL EVENTS:", len(events))
 
 for event in events[:20]:
     print(
