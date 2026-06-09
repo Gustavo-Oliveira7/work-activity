@@ -11,7 +11,7 @@ headers = {
     "Accept": "application/vnd.github+json"
 }
 
-url = f"https://api.github.com/users/{USERNAME}/events"
+url = "https://api.github.com/user/events"
 
 response = requests.get(url, headers=headers)
 events = response.json()
