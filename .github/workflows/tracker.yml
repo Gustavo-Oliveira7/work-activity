@@ -32,7 +32,7 @@ jobs:
           CORP_GITHUB_TOKEN: ${{ secrets.CORP_GITHUB_TOKEN }}
           CORP_USERNAME: ${{ secrets.CORP_USER }}
         run: |
-          python scripts/tracker.py > output.txt
+          python scripts/tracker.py | tee output.txt
 
       - name: Commit changes
         run: |
