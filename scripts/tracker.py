@@ -14,6 +14,9 @@ headers = {
 url = "https://api.github.com/user/events"
 
 response = requests.get(url, headers=headers)
+print("STATUS:", response.status_code)
+print(response.text)
+exit()
 events = response.json()
 
 with open("state.json", "r") as f:
